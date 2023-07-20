@@ -1,0 +1,98 @@
+Play with Ansible Module
+
+Imperative and Declarative 
+
+Imperative: Very quick, can not execute sequence of tasks, if history of terminal got terminated not able to get it.
+
+Declarative: Very good for long term point of view. Need to write a playbook to acheive it
+
+Get the full list of Ansible Modules at 
+
+ansible-doc --list
+ansible-doc file
+(File is name of the module and serach for EXAMPLE)
+
+
+1	Creating Directory at Node
+	ansible <TARGET HOSTNAME> -m file -a 'path=/tmp/data state=directory'
+	EXAMPLE: ansible elite -m file -a 'path=/tmp/data state=directory'
+Ensure that has directory created or not at your node
+
+Ansible Playbook (YAML)
+
+	-file:
+       path: /tmp/data
+       state: directory 
+
+2	Copy file from Master to Node
+	Refer ansible copy module
+	ansible-doc copy
+
+	ansible <TARGET HOSTNAME> -m copy -a 'src=hosts dest=/tmp/data' 
+	Example: ansible elite -m copy -a 'src=hosts dest=/tmp/data'
+
+Ensure that has file copied or not at your node
+
+3	Experience with Convergence / Idempotent
+	(Convergence / Idempotent: produce same results if executed once or multiple times)
+
+	ansible <TARGET HOSTNAME> -m copy -a 'src=hosts dest=/root' 
+	
+Ensure that whether Convergence / Idempotent works or not
+
+4	Add line to a Text file
+	
+	4.1)	Copy file to node before adding new line
+	
+	ansible <TARGET HOSTNAME> -m copy -a 'src=ansible.cfg dest=/tmp/data/ansible.cfg' 
+
+	Search for module which allow to adding line 
+	ansible-doc --list
+	(search for lineinfile)
+	ansible-doc lineinfile
+	(search for EXAMPLE)
+	
+	4.2)	Adding new line
+	ansible <TARGET HOSTNAME> -m lineinfile -a 'path=/tmp/data/ansible.cfg line="NEW LINE" '
+	(Path : metioned node directory)
+
+Ensure that whether has newline added or not your node
+
+5	Install OS Packages (Web Server)
+	ansible-doc package
+	
+	ansible <TARGET HOSTNAME> -m package -a 'name=nginx state=present'
+	You get an error
+	
+	Apply below,
+	ansible <TARGET HOSTNAME> -m package -a 'name=nginx state=present' --become
+	
+	Still, if you get an error
+	Go to node, and get into directory of /etc/sudoers.d/
+	Adding new file and name as rootuser
+	At rootuser file, add as per below which is syntax of sudo
+	root ALL=(ALL:ALL) NOPASSWD:ALL
+	(root is a user name)
+	ALL : All hosts
+	ALL : All Users
+	ALL : All groups
+	ALL : All Commands wihtout asking Password
+
+	ansible <TARGET HOSTNAME> -m package -a 'name=nginx state=present' --become
+
+Ensure that Nginx installed or not by using below commands
+	systemctl status nginx
+	Run the nginx
+	curl localhost
+	
+
+1	Copy file from master to Worker Node
+	(Control machine to Target Host)
+
+2	Exp with Convergence / Idempotent
+
+3	Add line to a Text file
+
+4	Install OS Packages (Web Server)
+
+5	SUDO Access - Elevate Remote User Privileges

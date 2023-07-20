@@ -1,0 +1,73 @@
+Role is all about Reusability
+
+Do visit at "Ansible Galaxy Portal"
+
+I) Create a new sample role with directory skeleton
+
+Get into role directory
+
+ansible-galaxy init my-role
+------------------------------------------------------------------------------------------------------------
+II) Import role in Playbook
+
+Tell Ansible where roles are downloaded
+
+Edit ansible.cfg by using editor vi
+
+roles_path = /etc/ansible/roles
+or
+roles_path = ./roles
+-------------------------------------------------------------------------------------------------------------------
+
+III)	Ansible role to  Install Jenkins
+
+Go to Ansible Galaxy Portal and search for "Jenkins geerlingguy"
+
+Create file name as requirements.yml
+(vi requirements.yml)
+
+# - src: 
+#   name: 
+#   version: 
+roles:
+- src: geerlingguy.java
+  name: geerlingguy.java
+ 
+- src: geerlingguy.jenkins
+  name: geerlingguy.jenkins
+  
+Download the roles as per below
+ 
+ansible-galaxy install -r requirements.yml
+
+Ensure that role has created or not
+
+Go to roles directory and apply ls -lrt 
+
+You can get two roles such as 
+geerlingguy.java
+geerlingguy.jenkins
+ ---------------------------------------------------------------------------------------------------
+ IV)	Create playbook for Roles
+ vi jenkins.yml
+
+- hosts: all
+  become: true
+  vars:
+    java_packages:
+      - openjdk-11-jdk
+  roles:
+    - role: geerlingguy.java
+	- role: geerlingguy.jenkins
+	
+ansible-playbook jenkins.yml
+
+-------------------------------------------
+V)	Ensure Jenkins installed or not
+Go AWS EC2 Dashboard, select Debian node public IP address
+Create new browser, supply Debian node public IP address:8080
+Example: 34.229.153.119:8080
+You get Jenkins login page and supply username and password details
+Username is admin
+Password is admin
+

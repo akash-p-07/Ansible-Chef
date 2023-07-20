@@ -1,0 +1,104 @@
+Ansible vault
+
+users.yml
+
+assignment_users:
+- name: kumar
+  password: kumar123
+  role: devopsconsultants
+- name: raj
+  password: raj123
+  role: developer
+- name: diya
+  password: diya123
+  role: ops
+
+Password should not be exposed but need to be encrypted.
+Ansible vault support encryption
+Ansible vault able to encrypt and decrypt
+__________________________________________________________________________________________________________________________
+
+Declaration
+
+Create file name as key.txt
+MySuperPa$$od
+
+Incorporate key.txt at ansible.cfg
+
+vault_password_file = ./key.txt
+__________________________________________________________________________________________________________________________
+Delete file of users.yml
+ 
+Create Encrypted file
+ansible-vault create users.yml
+
+assignment_users:
+- name: kumar
+  password: kumar123
+  role: devopsconsultants
+- name: raj
+  password: raj123
+  role: developer
+- name: diya
+  password: diya123
+  role: ops
+  
+
+cat users.yml
+
+Encrypt existing clear text file
+ansible-vault encrypt users.yml
+
+Decrypt encrypted file
+ansible-vault decrypt --ask-vault-pass users.yml 
+(Break the encrypt)
+cat users.yml
+
+Make encrypt
+ansible-vault encrypt users.yml
+
+Edit encrypted file
+ansible-vault edit users.yml 
+_________________________________________________________________________________________________________________________
+
+Create file
+ansible-vault create newuser.yml
+my_user:
+- name: kumar
+  password: kumar123
+
+I want to display contSent of newuser.yml
+
+cat newuser.yml
+You get output with encrypted formnt
+
+If you want to look at the file with encrypted format
+
+ansible-vault view newuser.yml
+__________________________________________________________________________________________________________________________
+
+Hands on
+
+- name: play use encrypted vars
+  hosts: localhost
+  vars_files:
+  - newuser.yml
+  tasks:
+  - name: encrypted variable is printed
+    debug:
+      var: my_user
+
+Run playbook and you get user name and password
+ansible-playbook <FILENAME> --ask-vault-pass
+
+Edit newuser.yml 
+
+Edit encrypted file
+ansible-vault edit newuser.yml
+
+my_user:
+- name: diya
+  password: diya123
+
+Run playbook and you get latest user name and password
+ansible-playbook <FILENAME> --ask-vault-pass

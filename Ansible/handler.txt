@@ -1,0 +1,37 @@
+Ansible notify when changed
+
+In Ansible, a handler refers to a particular task that executes when triggered by the notify module
+
+Handlers perform an action defined in the task when a change occurs in the remote host.
+
+Handlers are helpful when you need to perform a task that relies on a specific task’s success or failure.
+
+For example, you can set a handler to send logs if the service goes down.
+
+
+To illustrate how to use the Ansible handler, let us a simple example. The playbook below will install the nginx server and use a handler to start the service.
+
+---
+- hosts: all
+  become: true
+  gather_facts: no
+  tasks:
+  - name: "install nginx"
+    package:
+      name: nginx
+      state: present
+    notify: startnginx
+  handlers:
+    - name: startnginx # Name same as notify
+      service:
+        name: nginx
+        state: started
+
+
+In the example playbook above, we start by installing the nginx server using the package module. We then use a notify module to set a notify action
+
+The final step is to configure a handler to run after the server is installed. 
+
+The name of the notification should be the same as the name used in the handler module. Otherwise, the specified handler will fail.
+
+

@@ -1,0 +1,103 @@
+Experience with Playbook
+
+--syntax-check
+
+Gathering Facts
+(Collect all criteria of nodes such as OS, memory, disk, etc ...)
+
+Playbook executing tasks in sequence
+
+
+
+**************************************************************
+
+Naming is best Pratice
+
+Assign name for each play
+
+Assign name for each task
+
+name key is optinal but very handy while executing
+
+
+**************************************************************
+Converting adhoc command to YAML plays
+
+Questions for this assignment
+
+1	Convert the following adhoc command to an Ansibe playbook in YAML file ?
+
+ansible <GROUP NAME> -m user -a "name=odoo state=present"
+
+Ensure that user has created or not
+Apply, id odoo
+or
+cat /etc/passwd
+
+- name: play for Question 1
+  hosts: app1.company.com
+  tasks:
+  - name: user odoo exists
+    user:
+      name: odoo
+      state: present
+
+Run, ansible-playbook <FILE NAME>
+
+Ensure that user has created or not worker node, apply below commands
+
+cat /etc/passwd
+*************************************************************
+
+2	Convert the following 2 adhoc commands to a single Play in a playbook file:
+
+ansible all -m file  -a "path=/opt/data state=directory"
+
+ansible all -m copy -a "content='TopSecret' dest='/opt/data/secret.txt'"
+
+- name: play for Question 2
+  hosts: all
+  tasks:
+  - name: dir exists
+    file:
+      path: /opt/data
+      state: directory
+  - name: File secret is generated
+    copy:
+      content: TopSecret
+      dest: /opt/data/secret.txt
+
+**************************************************************
+
+Deploy Static Website
+
+Fork below URL
+
+https://github.com/nramnad/ansible-example-static-website
+
+
+- hosts: all
+  become: yes
+  tasks:
+  - name: webserver is installed
+    package:
+      name: nginx
+      state: present
+  - name: webserver is up
+    service:
+      name: nginx
+      state: started
+
+  - name: webserver root directory exists
+    file:
+      path: /var/www/html
+      state: directory
+  - name: static website is deployed
+    uri:
+      url: https://raw.githubusercontent.com/nramnad/ansible-ci-cd/main/index.html # Supply your GitHub URL
+      dest: /var/www/html # /usr/share/nginx/html
+
+
+
+
+

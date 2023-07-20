@@ -1,0 +1,49 @@
+Ansbile Facts
+
+Automatically discovered about worker node (target host)
+
+Task 0 in each playbook
+Uses Setup module
+Variables are attached to the parent var ansible_facts
+
+	Hostname
+	fqdn (frequently qualified domain name)
+	OS Kernal
+	Distribution (Which OS)
+	Devices
+	Partition
+	Size
+
+If you want to turn off gather facts (gather_facts: no)
+__________________________________________________________________________________________________________________________
+
+Ansbile Facts Hands on
+
+- name: play for discover gather facts task
+  hosts: ec2
+  tasks:
+  - name: print ansible_facts
+    debug:
+      var: ansible_facts
+
+Run the playbook
+
+Redirect output is
+
+ansible-playbook <FILE NAME> > facts
+
+Open facts file
+__________________________________________________________________________________________________________________________
+
+Turn off Gathering Facts
+
+- name: play for turn-off gather facts task
+  hosts: ec2
+  gather_facts: no
+  tasks:
+  - name: print ansible_facts
+    debug:
+      var: ansible_facts
+
+
+

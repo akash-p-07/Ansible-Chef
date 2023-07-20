@@ -1,0 +1,240 @@
+Ansible Variable
+
+Use variables to avoid repeating yourself
+
+DRY Princple : Don't Repeat Yourself
+
+Fork below Github Repo
+
+https://github.com/nramnad/ansible-ci-cd
+
+
+
+- hosts: ec2
+  become: yes
+  vars: # Specify list of variables which act like place holder
+    webserver: nginx # wherever there is nginx which can be replaced by webserver
+    webserver_root_dir: /var/www/html # wherever there is /var/www/html which can be replaced by webserver_root_dir
+  tasks:
+  - name: webserver is going to be installed
+    package:
+      name: "{{ webserver }}" # nginx replaced by variable webserver
+      state: present
+  - name: webserver is up
+    service:
+      name: "{{ webserver }}"
+      state: started
+
+  - name: webserver root directory exists
+    file:
+      path: "{{ webserver_root_dir }}"
+      state: directory
+  - name: static website is deployed
+    uri:
+      url: https://raw.githubusercontent.com/nramnad/ansible-ci-cd/main/index.html
+      dest: "{{ webserver_root_dir }}" # /usr/share/nginx/html
+
+
+Run the playbook
+ansible-playbook <FILE NAME>
+
+Ensure Nginx deployed or not
+Go browser, supply worker node public ip or public dns 
+__________________________________________________________________________________________________________________________
+
+Variable Naming Validity
+
+Refer PDF 
+__________________________________________________________________________________________________________________________
+
+Variables Scope and Order of Precedence
+
+1	Ansible playbook with variables
+2	Variable naming validity
+3	Variables Scope in Playbook
+
+	3.1	Variables in command line
+	
+		ansible-playbook <FILE NAME> --extra-vars webserver=nginx
+
+	3.2	Variables Defined in Playbook
+		
+		Create new file name as myvars.yml and add below contents
+
+		webserver: nginx
+		webserver_root_dir: /var/www/html
+
+- hosts: ec2
+  become: yes
+  vars_files: myvars.yml
+  tasks:
+  - name: webserver is installed
+    package:
+      name: "{{ webserver }}" # nginx replaced by variable webserver
+      state: present
+  - name: webserver is up
+    service:
+      name: "{{ webserver }}"
+      state: started
+
+  - name: webserver root directory exists
+    file:
+      path: "{{ webserver_root_dir }}"
+      state: directory
+  - name: static website is deployed
+    uri:
+      url: https://raw.githubusercontent.com/nramnad/ansible-ci-cd/main/index.html
+      dest: "{{ webserver_root_dir }}" # /usr/share/nginx/html
+
+__________________________________________________________________________________________________________________________
+
+	
+	3.3	Variables Defined in Inventory
+		Go to Host file and make the changes
+		
+	Variable  precedence
+
+	Highest Priorties in the order as per below
+
+	Variables in command line
+	Variables Defined in Playbook
+	Variables Defined in Inventory
+__________________________________________________________________________________________________________________________
+Variables with Global Scope
+
+To have more visibility about value of variables using module "debug"
+debug module display value of variables using var attributes
+
+
+- hosts: rs2000 # as per your inventory
+  become: yes
+  vars:
+    webserver: nginx
+    webserver_root_dir: /var/www/html
+  tasks:
+  - name: debug
+    debug:
+      msg: "the value of webserver is {{ webserver }}"
+
+Run the playbook
+ansible-playbook <FILE NAME>
+(Check value of message)
+You get it as "message": "the value of webserver is nginx"
+
+Run the playbook with --extra-vars
+
+ansible-playbook <FILE NAME> --extra-vars webserver=httpd
+(Check value of message)
+You get it as "message": "the value of webserver is httpd"
+
+Variable assigned at command line which are highest Precedence
+__________________________________________________________________________________________________________________________
+Variable with Host Scope or (Variables Defined in Inventory)
+At your hosts file
+[dbgrp]
+<WORKER PVT IP> webserver=tomcat
+
+- hosts: ec2 # as per your inventory
+  become: yes
+  vars:
+    webserver: nginx
+    webserver_root_dir: /var/www/html
+  tasks:
+  - name: debug
+    debug:
+      msg: "the value of webserver is {{ webserver }}"
+
+Run the playbook.
+You can get message of nginx not a tomcat because of Variable  precedence
+
+
+	Variables in command line
+	Variables Defined in Playbook
+	Variables Defined in Inventory
+
+If you want message of tomcat, delete variable of webserver
+
+- hosts: ec2 # as per your inventory
+  become: yes
+  vars:
+    webserver_root_dir: /var/www/html
+  tasks:
+  - name: debug
+    debug:
+      msg: "the value of webserver is {{ webserver }}"
+
+Run the playbook.
+You can get message of tomcat not a nginx 
+__________________________________________________________________________________________________________________________
+Variables with Play Scope
+
+vars_files:
+- myvars.yml
+
+Use externalize variables by external file (import file)
+
+Create new file which name vars.yml and add below content
+
+webserver: nginx
+webserver_root_dir: /var/www/html
+
+Review below playbook, where we added new command of vars_files. At vars_files, calling vars.yml file
+(It is place holder and follow principle of Don't Repeat Yourself)
+
+- hosts: ec2 # as per your inventory
+  become: yes
+  vars_files:
+  - myvars.yml
+
+  tasks:
+  - name: debug
+    debug:
+      msg: "the value of webserver is {{ webserver }}"
+__________________________________________________________________________________________________________________________
+CI/CD using variables
+
+Fork below Github Repo
+
+https://github.com/nramnad/ansible-ci-cd
+
+Review index.html and look for howmany branch are there at GitHub Repo
+Please note your branch details
+
+Review below Playbook
+
+- hosts: ec2 # as per your inventory
+  become: yes
+  vars:
+    webserver: nginx
+    webserver_root_dir: /var/www/html
+    git_branch: main # Github Branch Name
+  tasks:
+  - name: webserver is installed
+    package:
+      name: "{{ webserver }}"
+      state: present
+  - name: webserver is up
+    service:
+      name: "{{ webserver }}"
+      state: started
+  - name: webserver root directory exists
+    file:
+      path: "{{ webserver_root_dir }}"
+      state: directory
+  - name: static website is deployed
+    uri:
+      url: https://raw.githubusercontent.com/nramnad/ansible-ci-cd/{{git_branch}}/index.html
+      dest: "{{ webserver_root_dir }}" # /usr/share/nginx/html
+
+Overriding default variables by using --extra-vars
+
+ansible-playbook <FILE NAME> --extra-vars git_branch=<BRANCH NAME>
+
+For Rollback, 
+
+ansible-playbook <FILE NAME> --extra-vars git_branch=main
+
+or
+
+ansible-playbook <FILE NAME>
+

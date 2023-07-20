@@ -1,0 +1,69 @@
+Install Ansible On Ubuntu 22.04
+
+Go to ec2 and create one node 
+
+At Advanced Details, User Data section apply below
+
+#!/bin/bash
+sudo su
+apt-add-repository ppa:ansible/ansible -y
+apt update -y
+apt install ansible -y
+
+Ensure Ansible installed or not
+ansible --version
+**************************************************************************************************************************
+Create one worker node under Debian 11
+
+**************************************************************************************************************************
+
+At Worker node
+
+2)	Change user to root user by applying
+	sudo -su or sudo -i
+
+3)	Go to root user and obtain root user password
+	passwd root
+	
+4)	Go to cd /etc/ssh and edit at sshd_config file as per below
+	(Apply vi sshd_config)
+
+	Uncommnad the # key of PermitRootLogin yes
+        (Delete # key)
+	Uncommand the # key on PasswordAuthentication yes
+	
+
+5)	Restart the sshd service by applying below
+	systemctl restart sshd (for all instances such as Master and Webgroup)
+
+
+
+**************************************************************************************************************************
+II.	SSH Execution (Master Only)
+
+1) ssh-keygen 
+Now key has generated which need to be shared across all machine for connection without password
+
+2) ssh-copy-id username@workernode Private Ip Address
+
+Apply ssh-copy-id of all as per combination (ssh-copy-id username@172.31.18.172) : Private Ip Address
+User name is at Node you obtain password of user
+
+Example: if you are in master, ssh-copy-id root@172.31.18.172
+
+Check whether ssh key is working or not (First time ask for passwor and no prompt for asking password 2nd time onwards)
+
+3) Ensure that, you can get into worker node from master w/o asking Password
+
+Command : ssh root@<Pvt ip address of Wokrer Node>
+
+(root is a user name and each machine communicate each other w/o asking password)
+
+Example: ssh root@172.31.18.172
+
+By applying exit command, switch from node to Master
+
+**************************************************************************************************************************
+
+
+
